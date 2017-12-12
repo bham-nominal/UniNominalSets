@@ -1,5 +1,5 @@
-.dir-locals.el
 .DS_Store
+.dir-locals.el
 
 
 ## Coq files
