@@ -1,0 +1,8 @@
+.dir-locals.el
+.DS_Store
+
+
+## Coq files
+*.glob
+*.vo
+*.v.d
