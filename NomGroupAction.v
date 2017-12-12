@@ -75,7 +75,7 @@ Section Perm.
     - exact l.
   Defined.
 
-  Definition equiv_gr : hrel carrier.
+  Definition hrel_gr : hrel carrier.
     unfold hrel.
     intros l₁ l₂.
     use hProppair.
@@ -85,11 +85,50 @@ Section Perm.
       + apply X.
   Defined.
 
-  Definition carrier_q := setquot equiv_gr.
+  Definition equiv_gr : eqrel carrier.
+    use eqrelconstr.
+    - exact hrel_gr.
+    - intros l₁ l₂ l₃.
+      intros H₁ H₂.
+      unfold hrel_gr in *.
+      simpl in *.
+      rewrite H₁. exact H₂.
+    - intros l. simpl. reflexivity.
+    - intros l₁ l₂ H. simpl in *. symmetry. exact H.
+  Defined.
 
-  Definition unit : carrier := nil.
-  Definition mult : carrier -> carrier -> carrier := concatenate.
-  Definition inv  : carrier -> carrier := rev (setdirprod A A).
+  Definition carrier_q : hSet := setquotinset equiv_gr.
+
+  Definition unit : carrier_q.
+    use setquotpair.
+    - exact (setquotpr equiv_gr nil).
+    - use iseqclassconstr.
+      + apply hinhpr.
+        simpl.
+        use (carrierpair).
+        * exact nil.
+        * simpl.
+          reflexivity.
+      + intros.
+        simpl in *.
+        rewrite X0. exact X.
+      + intros. simpl in *.
+        rewrite <- X.
+        exact X0.
+  Defined.
+
+  Definition concatenate_q (l₁ l₂ : carrier) : carrier_q.
+    use setquotpair.
+    - exact (setquotpr equiv_gr (concatenate l₁ l₂)).
+    - 
+
+  Definition mult : carrier_q -> carrier_q -> carrier_q.
+    intros g₁ g₂.
+    pose (setquotuniv2 equiv_gr carrier_q concatenate_q g₁ g₂).
+    concatenate.
+
+
+  Definition inv  : carrier_q -> carrier_q := rev (setdirprod A A).
 
   Definition assoc : isassoc mult := concatenate_assoc (setdirprod A A).
 
