@@ -50,12 +50,46 @@ End ListFacts.
 Section Perm.
 
   Context (A : hSet).
+  Context (dec : isdeceq A).
 
-  Definition supp : hSet := @setlist (setdirprod A A).
+  Definition carrier : hSet := @setlist (setdirprod A A).
 
-  Definition unit : supp := nil.
-  Definition mult : supp -> supp -> supp := concatenate.
-  Definition inv  : supp -> supp := rev (setdirprod A A).
+  Definition swap (a₁ a₂ : A) (a : A) : A.
+    apply (@coprod_rect (a₁ = a) (a₁ != a)).
+    - intros eq. exact a₂.
+    - intros neq.
+      apply (@coprod_rect (a₂ = a) (a₂ != a)).
+      + intros eq. exact a₁.
+      + intros neq_a_a₂. exact a.
+      + exact (dec a₂ a).
+    - exact (dec a₁ a).
+  Defined.
+
+  Definition actA : carrier -> A -> A.
+    intros l a.
+    apply (@list_ind (setdirprod A A)).
+    - exact a.
+    - intros x xs a'.
+      (* actA xs a = a' *)
+      exact (swap (pr1 x) (pr2 x) a').
+    - exact l.
+  Defined.
+
+  Definition equiv_gr : hrel carrier.
+    unfold hrel.
+    intros l₁ l₂.
+    use hProppair.
+    - exact (actA l₁ = actA l₂).
+    - assert (isaset (A -> A)).
+      + apply isaset_forall_hSet.
+      + apply X.
+  Defined.
+
+  Definition carrier_q := setquot equiv_gr.
+
+  Definition unit : carrier := nil.
+  Definition mult : carrier -> carrier -> carrier := concatenate.
+  Definition inv  : carrier -> carrier := rev (setdirprod A A).
 
   Definition assoc : isassoc mult := concatenate_assoc (setdirprod A A).
 
@@ -99,7 +133,7 @@ Section Perm.
   Definition Perm : gr.
     use grconstr.
     - use setwithbinoppair.
-      + exact supp.
+      + exact carrier.
       + exact mult.
     - simpl. exact grop.
   Defined.
