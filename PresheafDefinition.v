@@ -1,6 +1,3 @@
-(* -*- coq-prog-args: ("-emacs", "type-in-type"); -*- *)
-
-	     (* (setq coq-prog-args `("-emacs" "-indices-matter" "-R" ,(expand-file-name (locate-dominating-file buffer-file-name ".dir-locals.el")) "Modules" ))))))) *)
 Require Import UniMath.Combinatorics.StandardFiniteSets.
 Require Import UniMath.CategoryTheory.Categories.
 Require Import UniMath.Foundations.PartA.
