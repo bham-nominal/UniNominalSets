@@ -23,21 +23,28 @@ Section Perm.
     - exact (dec a₁ a).
   Defined.
 
-  Definition actA : carrier -> A -> A.
+  Definition actA_f : carrier -> A -> A.
     intros l a.
     apply (@list_ind (setdirprod A A)).
     - exact a.
     - intros x xs a'.
       (* actA xs a = a' *)
-      exact (swap (pr1 x) (pr2 x) a').
+      exact (swap_map (pr1 x) (pr2 x) a').
     - exact l.
   Defined.
+
+  Definition actA : carrier -> A ≃ A.
+    intros l.
+    use weqpair.
+    - exact (actA_f l).
+    - intro a.
+  Abort.
 
   Definition hrel_gr : hrel carrier.
     unfold hrel.
     intros l₁ l₂.
     use hProppair.
-    - exact (actA l₁ = actA l₂).
+    - exact (actA_f l₁ = actA_f l₂).
     - assert (isaset (A -> A)).
       + apply isaset_forall_hSet.
       + apply X.
@@ -93,10 +100,10 @@ Section Perm.
   Local Notation "l₁ @ l₂" := (concatenate l₁ l₂).
   Local Notation "x :: xs" := (cons x xs).
 
-  Fact act_cons_swap : forall x xs, actA (x :: xs) = swap (pr1 x) (pr2 x) ∘ actA xs.
+  Fact act_cons_swap : forall x xs, actA_f (x :: xs) = swap_map (pr1 x) (pr2 x) ∘ actA_f xs.
   Proof.
     intros.
-    unfold actA.
+    unfold actA_f.
     apply funextfun.
     intros a.
     simpl.
@@ -106,11 +113,11 @@ Section Perm.
   Defined.
 
 
-  Lemma act_concat : forall l1 l2, actA (concatenate l1 l2) = (actA l1) ∘ (actA l2).
+  Lemma act_concat : forall l1 l2, actA_f (concatenate l1 l2) = (actA_f l1) ∘ (actA_f l2).
   Proof.
     intros l1 l2.
     apply (@list_ind (setdirprod A A)
-                     (λ l1, actA (concatenate l1 l2) = actA l1 ∘ actA l2)).
+                     (λ l1, actA_f (concatenate l1 l2) = actA_f l1 ∘ actA_f l2)).
     - apply idpath.
     - intros.
       rewrite concatenateStep.
@@ -141,22 +148,36 @@ Section Perm.
     exact (setquotuniv2 equiv_gr carrier_q concatenate_q compat_concat g₁ g₂).
   Defined.
 
-  Definition rev_q (l : carrier) : carrier_q.
+  Definition inv_q (l : carrier) : carrier_q.
     use setquotpair.
     - exact (setquotpr equiv_gr (rev (setdirprod A A) l)).
     - use iseqclassconstr.
       + apply hinhpr.
         use carrierpair.
         * exact (rev (setdirprod A A) l).
-        * simpl. reflexivity.
-      + intros. simpl in *.
-        rewrite X in X0.
-        exact X0.
-      + intros. simpl in *.
-        rewrite X in X0. exact X0.
+        * simpl. apply idpath.
+      + intros l1 l2 R_l1_l2 Rl1. simpl in *.
+        rewrite Rl1. assumption.
+      + intros l1 l2 h h'. simpl in *.
+        rewrite <- h. exact h'.
   Defined.
 
-  Definition inv : carrier_q -> carrier_q.
+  (* Lemma act_rev : forall l, actA_f (rev _ l) = invmap (actA_f l). *)
+  (* Problem: actA_f isn't an equialence for Coq *)
+
+  Fact compat_inv : iscomprelfun equiv_gr inv_q.
+  Proof.
+    intros l1 l2 R_l1_l2. simpl in *.
+    apply subtypeEquality'.
+    - simpl. change (fun x => ?h x) with h.
+      pose @funextfun. unfold funextfunStatement in f.
+      apply f. intro l.
+      apply subtypeEquality'.
+      + simpl. admit.
+      + apply isapropisaprop.
+    - apply isapropiseqclass.
+  (* Defined. *)
+  Admitted.
 
   Definition assoc : isassoc mult := concatenate_assoc (setdirprod A A).
 
