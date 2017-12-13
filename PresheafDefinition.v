@@ -14,7 +14,7 @@ Lemma incl_eq A B (f g : incl A B) :  pr1incl _ _ f = pr1incl _ _ g -> f = g.
   apply subtypeEquality'.
   - exact e.
   - apply isapropisincl.
-Qed.
+Defined.
 Lemma isincl_idfun (A : UU) : isincl (idfun A).
 Proof.
   intros a e e'.
@@ -61,3 +61,6 @@ Qed.
 Definition names_cat : category := (names_precat ,, has_homsets_names_precat).
 
 Definition nominal_set_cat := [ names_cat, hset_category].
+
+Section nameabstraction.
+  Variable (X : nominal_set_cat).
