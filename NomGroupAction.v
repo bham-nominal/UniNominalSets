@@ -12,7 +12,7 @@ Section Perm.
 
   Definition carrier : hSet := @setlist (setdirprod A A).
 
-  Definition swap (a₁ a₂ : A) (a : A) : A.
+  Definition swap_map (a₁ a₂ : A) (a : A) : A.
     apply (@coprod_rect (a₁ = a) (a₁ != a)).
     - intros eq. exact a₂.
     - intros neq.
@@ -90,10 +90,37 @@ Section Perm.
         rewrite X in X0. exact X0.
   Defined.
 
+  Local Notation "l₁ @ l₂" := (concatenate l₁ l₂).
+  Local Notation "x :: xs" := (cons x xs).
+
+  Fact act_cons_swap : forall x xs, actA (x :: xs) = swap (pr1 x) (pr2 x) ∘ actA xs.
+  Proof.
+    intros.
+    unfold actA.
+    apply funextfun.
+    intros a.
+    simpl.
+    rewrite list_ind_compute_2.
+    unfold funcomp.
+    reflexivity.
+  Defined.
+
+
   Lemma act_concat : forall l1 l2, actA (concatenate l1 l2) = (actA l1) ∘ (actA l2).
   Proof.
     intros l1 l2.
-  Admitted.
+    apply (@list_ind (setdirprod A A)
+                     (λ l1, actA (concatenate l1 l2) = actA l1 ∘ actA l2)).
+    - apply idpath.
+    - intros.
+      rewrite concatenateStep.
+      idtac.
+      pose (act_cons_swap x (xs @ l2)).
+      rewrite X in p.
+      rewrite funcomp_assoc in p.
+      rewrite <- (act_cons_swap x xs) in p.
+      exact p.
+  Defined.
 
   Fact compat_concat : iscomprelfun2 equiv_gr concatenate_q.
     intros x ? y y' R_x_x' R_y_y'.
@@ -114,7 +141,22 @@ Section Perm.
     exact (setquotuniv2 equiv_gr carrier_q concatenate_q compat_concat g₁ g₂).
   Defined.
 
-  Definition inv  : carrier_q -> carrier_q := rev (setdirprod A A).
+  Definition rev_q (l : carrier) : carrier_q.
+    use setquotpair.
+    - exact (setquotpr equiv_gr (rev (setdirprod A A) l)).
+    - use iseqclassconstr.
+      + apply hinhpr.
+        use carrierpair.
+        * exact (rev (setdirprod A A) l).
+        * simpl. reflexivity.
+      + intros. simpl in *.
+        rewrite X in X0.
+        exact X0.
+      + intros. simpl in *.
+        rewrite X in X0. exact X0.
+  Defined.
+
+  Definition inv : carrier_q -> carrier_q.
 
   Definition assoc : isassoc mult := concatenate_assoc (setdirprod A A).
 
