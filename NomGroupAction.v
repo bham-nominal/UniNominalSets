@@ -120,13 +120,56 @@ Section Perm.
   Definition concatenate_q (l₁ l₂ : carrier) : carrier_q.
     use setquotpair.
     - exact (setquotpr equiv_gr (concatenate l₁ l₂)).
-    - 
+    - use iseqclassconstr.
+      + apply hinhpr.
+        use carrierpair.
+        * exact (concatenate l₁ l₂).
+        * simpl. reflexivity.
+      + intros. simpl in *.
+        rewrite X in X0.
+        exact X0.
+      + intros. simpl in *.
+        rewrite X in X0. exact X0.
+  Defined.
+
+  Fact compat_concat : iscomprelfun2 equiv_gr concatenate_q.
+    intros x ? y y' R_x_x' R_y_y'.
+    simpl in R_x_x', R_y_y'.
+    Check concatenate_q x y.
+    (* use iseqclass *)
+    pose (iseqclass equiv_gr).
+    unfold iseqclass in u.
+    pose (concatenate_q x y).
+    pose (pr1 p).
+    pose (pr2 p). cbn beta in i.
+
+    unfold p in h. hnf in h.
+    use total2_paths_f.
+    - simpl.
+      remember (fun x1 : list (dirprod (pr1hSet A) (pr1hSet A)) =>
+                  hrel_gr (@concatenate (dirprod (pr1hSet A) (pr1hSet A)) x y) x1) as lhs.
+      remember (fun x1 : list (dirprod (pr1hSet A) (pr1hSet A)) =>
+                  hrel_gr (@concatenate (dirprod (pr1hSet A) (pr1hSet A)) x' y') x1) as rhs.
+
+      pose @funextfun. unfold funextfunStatement in f.
+      pose @impred_prop.
+      pose (i0 carrier lhs).
+
+    (* Because x and x' induce the same action, they should be in the same
+       equivalence class.
+
+       We want to show that the equivalence classes of x@x0 and x'@x0' are the
+       same, i.e. [x@x0] = [x'@x0']. 
+
+     *)
+
+    unfold concatenate_q.
+    unfold setquotpair. simpl.
 
   Definition mult : carrier_q -> carrier_q -> carrier_q.
     intros g₁ g₂.
-    pose (setquotuniv2 equiv_gr carrier_q concatenate_q g₁ g₂).
-    concatenate.
-
+    exact (setquotuniv2 equiv_gr carrier_q concatenate_q compat_concat g₁ g₂).
+  Defined.
 
   Definition inv  : carrier_q -> carrier_q := rev (setdirprod A A).
 
