@@ -65,7 +65,7 @@ Section Perm.
     - exact (dec a₁ a).
   Defined.
 
-  Definition actA : carrier -> A -> A.
+  Definition actA_f : carrier -> A -> A.
     intros l a.
     apply (@list_ind (setdirprod A A)).
     - exact a.
@@ -74,6 +74,13 @@ Section Perm.
       exact (swap (pr1 x) (pr2 x) a').
     - exact l.
   Defined.
+
+  Definition actA : carrier -> A ≃ A.
+    intros l.
+    use weqpair.
+    - exact (actA_f l).
+    - intro a.
+  Abort.
 
   Definition hrel_gr : hrel carrier.
     unfold hrel.
