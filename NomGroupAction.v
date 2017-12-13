@@ -132,39 +132,24 @@ Section Perm.
         rewrite X in X0. exact X0.
   Defined.
 
+  Lemma act_concat : forall l1 l2, actA (concatenate l1 l2) = (actA l1) ∘ (actA l2).
+  Proof.
+    intros l1 l2.
+  Admitted.
+
   Fact compat_concat : iscomprelfun2 equiv_gr concatenate_q.
     intros x ? y y' R_x_x' R_y_y'.
     simpl in R_x_x', R_y_y'.
-    Check concatenate_q x y.
-    (* use iseqclass *)
-    pose (iseqclass equiv_gr).
-    unfold iseqclass in u.
-    pose (concatenate_q x y).
-    pose (pr1 p).
-    pose (pr2 p). cbn beta in i.
-
-    unfold p in h. hnf in h.
-    use total2_paths_f.
-    - simpl.
-      remember (fun x1 : list (dirprod (pr1hSet A) (pr1hSet A)) =>
-                  hrel_gr (@concatenate (dirprod (pr1hSet A) (pr1hSet A)) x y) x1) as lhs.
-      remember (fun x1 : list (dirprod (pr1hSet A) (pr1hSet A)) =>
-                  hrel_gr (@concatenate (dirprod (pr1hSet A) (pr1hSet A)) x' y') x1) as rhs.
-
+    apply subtypeEquality'.
+    - simpl. change (fun x => ?h x) with h.
       pose @funextfun. unfold funextfunStatement in f.
-      pose @impred_prop.
-      pose (i0 carrier lhs).
-
-    (* Because x and x' induce the same action, they should be in the same
-       equivalence class.
-
-       We want to show that the equivalence classes of x@x0 and x'@x0' are the
-       same, i.e. [x@x0] = [x'@x0']. 
-
-     *)
-
-    unfold concatenate_q.
-    unfold setquotpair. simpl.
+      apply f. intro l.
+      apply subtypeEquality'.
+      + simpl. rewrite 2 act_concat.
+        now rewrite R_x_x', R_y_y'.
+      + apply isapropisaprop.
+    - apply isapropiseqclass.
+  Defined.
 
   Definition mult : carrier_q -> carrier_q -> carrier_q.
     intros g₁ g₂.
