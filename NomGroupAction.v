@@ -156,7 +156,36 @@ Section Perm.
     exact (setquotuniv2 equiv_gr carrier_q concatenate_q compat_concat g₁ g₂).
   Defined.
 
-  Definition inv  : carrier_q -> carrier_q := rev (setdirprod A A).
+  Definition inv_q (l : carrier) : carrier_q.
+    use setquotpair.
+    - exact (setquotpr equiv_gr (rev (setdirprod A A) l)).
+    - use iseqclassconstr.
+      + apply hinhpr.
+        use carrierpair.
+        * exact (rev (setdirprod A A) l).
+        * simpl. apply idpath.
+      + intros l1 l2 R_l1_l2 Rl1. simpl in *.
+        rewrite Rl1. assumption.
+      + intros l1 l2 h h'. simpl in *.
+        rewrite <- h. exact h'.
+  Defined.
+
+  (* Lemma act_rev : forall l, actA (rev _ l) = invmap (actA l). *)
+  (* Problem: actA isn't an equialence for Coq *)
+
+  Fact compat_inv : iscomprelfun equiv_gr inv_q.
+  Proof.
+    intros l1 l2 R_l1_l2. simpl in *.
+    apply subtypeEquality'.
+    - simpl. change (fun x => ?h x) with h.
+      pose @funextfun. unfold funextfunStatement in f.
+      apply f. intro l.
+      apply subtypeEquality'.
+      + simpl. admit.
+      + apply isapropisaprop.
+    - apply isapropiseqclass.
+  (* Defined. *)
+  Admitted.
 
   Definition assoc : isassoc mult := concatenate_assoc (setdirprod A A).
 

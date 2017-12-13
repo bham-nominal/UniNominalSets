@@ -6,3 +6,7 @@
 *.glob
 *.vo
 *.v.d
+
+
+Makefile
+Makefile.conf
