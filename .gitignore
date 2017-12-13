@@ -6,7 +6,7 @@
 *.glob
 *.vo
 *.v.d
-
+*.aux
 
 Makefile
 Makefile.conf
