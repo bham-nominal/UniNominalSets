@@ -1,6 +1,7 @@
 Require Import UniMath.Foundations.PartA.
 Require Import UniMath.Algebra.Monoids_and_Groups.
 Require Import UniMath.Combinatorics.Lists.
+Require Import UniMath.Ktheory.GroupAction.
 
 Require Import MoreLists.
 Require Import PermLists.
@@ -128,6 +129,7 @@ Section FinitePermutations.
   Defined.
 End FinitePermutations.
 
+(*
 Section GroupAction.
   Definition action (A : UU) (G : gr) : UU.
   Proof.
@@ -142,6 +144,7 @@ Section GroupAction.
     split ; [ apply lunax | apply assocax ].
   Defined.
 End GroupAction.
+*)
 
 Definition finite_perm_gr : gr.
 Proof.
@@ -152,20 +155,18 @@ Proof.
   exact (@is_sub_gr_finite_perms natset isdeceqnat).
 Defined.
 
-Definition app_action : action natset finite_perm_gr.
+Definition app_action : ActionStructure finite_perm_gr natset.
 Proof.
-  unfold action.
-  use tpair.
+  use make.
   - intros f n.
     apply (pr1 (pr1 f) n).
-  - use tpair.
-    + simpl.
-      reflexivity.
-    + intros f1 f2 n.
-      induction f1 as [f1 p1].
-      induction f2 as [f2 p2].
-      simpl.
-      reflexivity.
+  - simpl.
+    apply idpath.
+  - intros f1 f2 n.
+    induction f1 as [f1 p1].
+    induction f2 as [f2 p2].
+    simpl.
+    apply idpath.
 Defined.
 
 Definition member {A : UU} (deceqA : isdeceq A) : A -> list A -> bool.
@@ -181,25 +182,23 @@ Defined.
 
 Definition nominal_set : UU.
 Proof.
-  use (∑ (X : hSet) (f : action X finite_perm_gr), _).
-  use (∀ (x : X), hexists _).
-  - exact (list nat).
-  - intros l.
-    induction f as [f p].
-    use (∀ (π : finite_perm_gr), _).
+  use (∑ (X : hSet) (f : ActionStructure finite_perm_gr X), ∀ (x : X),
+          hexists (fun l : list nat => _)).
+  induction f as [f p].
+  use (∀ (π : finite_perm_gr), _).
+  use himpl.
+  - use (∀ (n : nat), _).
     use himpl.
-    + use (∀ (n : nat), _).
-      use himpl.
-      * use eqset.
-        -- exact boolset.
-        -- exact (member isdeceqnat n l).
-        -- exact true.
-      * unfold finite_perm_gr in π.
-        use eqset.
-        -- exact natset.
-        -- exact (pr1 (pr1 π) n).
-        -- exact n.
-    + use eqset ; [ apply X | apply (f π x) | apply x].
+    + use eqset.
+      * exact boolset.
+      * exact (member isdeceqnat n l).
+      * exact true.
+    + unfold finite_perm_gr in π.
+      use eqset.
+      * exact natset.
+      * exact (pr1 (pr1 π) n).
+      * exact n.
+  - use eqset ; [ apply X | apply (f π x) | apply x].
 Defined.
 
 Definition nat_nominal_set : nominal_set.
