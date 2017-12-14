@@ -9,20 +9,9 @@ Require Import PermLists.
 Section Perm.
 
   Context (A : hSet).
-  Context (decA : isdeceq A).
+  Context (dec_A : isdeceq A).
 
-  Definition carrier : hSet := swap_list A.
-
-  Definition swap_map (a₁ a₂ : A) (a : A) : A.
-    apply (@coprod_rect (a₁ = a) (a₁ != a)).
-    - intros eq. exact a₂.
-    - intros neq.
-      apply (@coprod_rect (a₂ = a) (a₂ != a)).
-      + intros eq. exact a₁.
-      + intros neq_a_a₂. exact a.
-      + exact (dec a₂ a).
-    - exact (dec a₁ a).
-  Defined.
+  Definition carrier : hSet := @swap_list A.
 
   Definition actA_f : carrier -> A -> A.
     intros l a.
@@ -30,7 +19,7 @@ Section Perm.
     - exact a.
     - intros x xs a'.
       (* actA xs a = a' *)
-      exact (swap_map (pr1 x) (pr2 x) a').
+      exact (swap_map dec_A x a').
     - exact l.
   Defined.
 
@@ -38,7 +27,7 @@ Section Perm.
     intros l.
     use weqgradth.
     - exact (actA_f l).
-    - exact (actA_f (rev l)).
+    - exact (actA_f (reverse l)).
     - intro a. admit.
     - intro a.
   Abort.
@@ -103,7 +92,7 @@ Section Perm.
   Local Notation "l₁ @ l₂" := (concatenate l₁ l₂).
   Local Notation "x :: xs" := (cons x xs).
 
-  Fact act_cons_swap : forall x xs, actA_f (x :: xs) = swap_map (pr1 x) (pr2 x) ∘ actA_f xs.
+  Fact act_cons_swap : forall x xs, actA_f (x :: xs) = swap_map dec_A x ∘ actA_f xs.
   Proof.
     intros.
     unfold actA_f.
@@ -153,11 +142,11 @@ Section Perm.
 
   Definition inv_q (l : carrier) : carrier_q.
     use setquotpair.
-    - exact (setquotpr equiv_gr (rev l)).
+    - exact (setquotpr equiv_gr (reverse l)).
     - use iseqclassconstr.
       + apply hinhpr.
         use carrierpair.
-        * exact (rev l).
+        * exact (reverse l).
         * simpl. apply idpath.
       + intros l1 l2 R_l1_l2 Rl1. simpl in *.
         rewrite Rl1. assumption.
