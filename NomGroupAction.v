@@ -8,6 +8,8 @@ Require Import PermLists.
 
 Section Perm.
 
+  Local Open Scope lists_scope.
+
   Context {A : hSet}.
   Context (dec_A : isdeceq A).
 
@@ -47,7 +49,7 @@ Section Perm.
     - intros.
       rewrite concatenateStep.
       idtac.
-      pose (act_cons_swap x (xs @ l2)).
+      pose (act_cons_swap x (xs ++ l2)).
       rewrite X in p.
       rewrite funcomp_assoc in p.
       rewrite <- (act_cons_swap x xs) in p.
@@ -67,9 +69,6 @@ Section Perm.
       rewrite swap_auto_inv. exact h.
   Defined.
 
-  (* Coming soon in MoreLists *)
-  Axiom reverse_involution : forall (l : carrier), l = reverse (reverse l).
-
   Definition actA : carrier -> A ≃ A.
     intros l.
     use weqgradth.
@@ -77,7 +76,7 @@ Section Perm.
     - exact (actA_f (reverse l)).
     - apply act_reverse_inverse.
     - pose (act_reverse_inverse (reverse l)).
-      rewrite <- reverse_involution in p. apply p.
+      rewrite reverse_involutive in p. apply p.
   Defined.
 
   Definition hrel_gr : hrel carrier.
@@ -173,10 +172,25 @@ Section Perm.
   Lemma act_rev : forall l, actA_f (reverse l) = invmap (actA l).
   Proof.
     intro l.
-    pose (isasetweqtoset A A (setproperty A)).
-    unfold invmap.
-    (* So what? *)
-  Admitted.
+    pose (h := act_reverse_inverse l).
+    change (∏ x : A, actA_f (reverse l) (actA_f l x) = x)
+    with (((actA_f (reverse l)) ∘ (actA_f l)) ~ idfun A) in h.
+    pose (h' := funhomot (invmap (actA l)) h).
+    assert (eq : actA_f l ∘ invmap (actA l) = idfun A).
+    { apply funextfun. intro x. unfold idfun, funcomp.
+      change (actA_f l (invmap (actA l) x) = x)
+      with (actA l (invmap (actA l) x) = x).
+      apply homotweqinvweq.
+    }
+    rewrite <- funcomp_assoc in h'.
+    rewrite eq in h'.
+    assert (obv1 : actA_f (reverse l) ∘ idfun A = actA_f (reverse l)).
+    { apply funextfun. intro x. unfold funcomp, idfun. apply idpath. }
+    assert (obv2 : idfun A ∘ invmap (actA l) = invmap (actA l)).
+    { apply funextfun. intro x. unfold funcomp, idfun. apply idpath. }
+    rewrite obv1, obv2 in h'.
+    apply funextfun. apply h'.
+  Defined.
 
   Fact compat_inv : iscomprelfun equiv_gr inv_q.
   Proof.
@@ -202,16 +216,38 @@ Section Perm.
   Definition unital : isunital mult.
     use isunitalpair.
     - exact unit.
-    - split.
-      + unfold islunit.
-        (* reflexivity. *)
-        admit.
+    - use isunitpair.
+      + assert (h : forall l, isaprop (mult unit l = l)).
+        { intro l'. apply (setproperty carrier_q). }
+        pose (goal := fun l => ((mult unit l = l),, h l)).
+        assert (forall l, pr1 (goal l)).
+        { use setquotunivprop.
+          intro x. cbn.
+          apply subtypeEquality'.
+          - cbn. apply idpath.
+          - apply isapropiseqclass.
+        }
+        unfold islunit. apply X.
       + unfold isrunit.
-        intros.
-        (* apply concatenate_nil_lunit. *)
-        admit.
-  (* Defined. *)
-  Admitted.
+        assert (h : forall l, isaprop (mult l unit = l)).
+        { intro l'. apply (setproperty carrier_q). }
+        pose (goal := fun l => ((mult l unit = l),, h l)).
+        assert (forall l, pr1 (goal l)).
+        { use setquotunivprop.
+          intro x. cbn.
+          apply subtypeEquality'.
+          - unfold concatenate_q. cbn.
+            apply funextfun. intro l.
+            (* unfold carrier, swap_list, swap in x. *)
+            simpl in x.
+            pose (concatenate_nil_runit swap x).
+            assert (x @ nil = x).
+            { exact p. }
+            rewrite X. apply idpath.
+          - apply isapropiseqclass.
+        }
+        apply X.
+  Defined.
 
   Definition monoidop : ismonoidop mult.
   apply mk_ismonoidop.
