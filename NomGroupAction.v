@@ -8,7 +8,7 @@ Require Import PermLists.
 
 Section Perm.
 
-  Context (A : hSet).
+  Context {A : hSet}.
   Context (dec_A : isdeceq A).
 
   Definition carrier : hSet := @swap_list A.
@@ -105,7 +105,7 @@ Section Perm.
   Defined.
 
 
-  Lemma act_concat : forall l1 l2, actA_f (concatenate l1 l2) = (actA_f l1) ∘ (actA_f l2).
+  Lemma act_concat_comp : forall l1 l2, actA_f (concatenate l1 l2) = (actA_f l1) ∘ (actA_f l2).
   Proof.
     intros l1 l2.
     apply (@list_ind (setdirprod A A)
@@ -129,7 +129,7 @@ Section Perm.
       pose @funextfun. unfold funextfunStatement in f.
       apply f. intro l.
       apply subtypeEquality'.
-      + simpl. rewrite 2 act_concat.
+      + simpl. rewrite 2 act_concat_comp.
         now rewrite R_x_x', R_y_y'.
       + apply isapropisaprop.
     - apply isapropiseqclass.
