@@ -45,3 +45,5 @@ Section ListFacts.
   Admitted.
 
 End ListFacts.
+
+Arguments rev {_} _.
