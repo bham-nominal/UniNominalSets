@@ -211,6 +211,11 @@ Section Perm.
     - apply isapropiseqclass.
   Defined.
 
+  Definition inv : carrier_q -> carrier_q.
+    intros g.
+    exact (setquotuniv equiv_gr carrier_q inv_q compat_inv g).
+  Defined.
+
   Definition unital : isunital mult.
     use isunitalpair.
     - exact unit.
@@ -276,22 +281,64 @@ Section Perm.
   Defined.
 
   Definition invstruct : invstruct mult monoidop.
-  use mk_invstruct.
-  (* - exact inv. *)
-  (* - unfold unel_is. simpl. *)
-  (*   apply mk_isinv. *)
-  (*   + unfold islinv. *)
-  (*     intros. *)
-
-  (*   + unfold isrinv. *)
-  (*     intros. *)
-  (*     admit. *)
-  Admitted.
+    use mk_invstruct.
+    - exact inv.
+    - use tpair.
+      + unfold islinv. cbn.
+        assert (prop : forall x, isaprop (mult (inv x) x = unit)).
+        { intro x. apply (setproperty carrier_q). }
+        pose (goal := fun x => (mult (inv x) x = unit),, prop x).
+        assert (cut : forall x, pr1 (goal x)).
+        { use setquotunivprop.
+          intro x. simpl.
+          apply subtypeEquality'.
+          - simpl.
+            apply funextfun. intro l.
+            apply subtypeEquality'.
+            + cbn. rewrite act_concat_comp.
+              assert (h : actA_f (reverse x) ∘ actA_f x = actA_f nil).
+              { apply funextfun.
+                unfold funcomp. intro y. rewrite act_reverse_inverse.
+                apply idpath.
+              }
+              simpl in h. rewrite <- h.
+              apply idpath.
+            + apply isapropisaprop.
+          - apply isapropiseqclass.
+        }
+        apply cut.
+      + cbn. unfold isrinv.
+        assert (prop : forall x, isaprop (mult x (inv x) = unit)).
+        { intro x. apply (setproperty carrier_q). }
+        pose (goal := fun x => (mult x (inv x) = unit),, prop x).
+        assert (cut : forall x, pr1 (goal x)).
+        { use setquotunivprop.
+          intro x. simpl.
+          apply subtypeEquality'.
+          - simpl.
+            apply funextfun. intro l.
+            apply subtypeEquality'.
+            + cbn. rewrite act_concat_comp.
+              assert (h : actA_f x ∘ actA_f (reverse x) = actA_f nil).
+              { apply funextfun.
+                unfold funcomp. intro y.
+                pose (act_reverse_inverse (reverse x)).
+                rewrite reverse_involutive in p.
+                rewrite p.
+                apply idpath.
+              }
+              simpl in h. rewrite <- h.
+              apply idpath.
+            + apply isapropisaprop.
+          - apply isapropiseqclass.
+        }
+        apply cut.
+  Defined.
 
   Definition grop : isgrop mult.
-  use mk_isgrop.
-  - exact monoidop.
-  - exact invstruct.
+    use mk_isgrop.
+    - exact monoidop.
+    - exact invstruct.
   Defined.
 
 
