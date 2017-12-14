@@ -4,13 +4,14 @@ Require Import UniMath.Ktheory.GroupAction.
 Require Import UniMath.Foundations.Sets.
 
 Require Import MoreLists.
+Require Import PermLists.
 
 Section Perm.
 
   Context (A : hSet).
-  Context (dec : isdeceq A).
+  Context (decA : isdeceq A).
 
-  Definition carrier : hSet := @setlist (setdirprod A A).
+  Definition carrier : hSet := swap_list A.
 
   Definition swap_map (a₁ a₂ : A) (a : A) : A.
     apply (@coprod_rect (a₁ = a) (a₁ != a)).

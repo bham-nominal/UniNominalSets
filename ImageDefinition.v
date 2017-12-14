@@ -2,6 +2,9 @@ Require Import UniMath.Foundations.PartA.
 Require Import UniMath.Algebra.Monoids_and_Groups.
 Require Import UniMath.Combinatorics.Lists.
 
+Require Import MoreLists.
+Require Import PermList.
+
 Definition reverse {X : UU} : list X -> list X.
 Proof.
   use list_ind.
