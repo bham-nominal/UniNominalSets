@@ -173,10 +173,25 @@ Section Perm.
   Lemma act_rev : forall l, actA_f (reverse l) = invmap (actA l).
   Proof.
     intro l.
-    pose (isasetweqtoset A A (setproperty A)).
-    unfold invmap.
-    (* So what? *)
-  Admitted.
+    pose (h := act_reverse_inverse l).
+    change (∏ x : A, actA_f (reverse l) (actA_f l x) = x)
+    with (((actA_f (reverse l)) ∘ (actA_f l)) ~ idfun A) in h.
+    pose (h' := funhomot (invmap (actA l)) h).
+    assert (eq : actA_f l ∘ invmap (actA l) = idfun A).
+    { apply funextfun. intro x. unfold idfun, funcomp.
+      change (actA_f l (invmap (actA l) x) = x)
+      with (actA l (invmap (actA l) x) = x).
+      apply homotweqinvweq.
+    }
+    rewrite <- funcomp_assoc in h'.
+    rewrite eq in h'.
+    assert (obv1 : actA_f (reverse l) ∘ idfun A = actA_f (reverse l)).
+    { apply funextfun. intro x. unfold funcomp, idfun. apply idpath. }
+    assert (obv2 : idfun A ∘ invmap (actA l) = invmap (actA l)).
+    { apply funextfun. intro x. unfold funcomp, idfun. apply idpath. }
+    rewrite obv1, obv2 in h'.
+    apply funextfun. apply h'.
+  Defined.
 
   Fact compat_inv : iscomprelfun equiv_gr inv_q.
   Proof.
