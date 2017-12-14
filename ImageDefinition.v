@@ -269,7 +269,7 @@ Section FinitePermutations.
   Defined.
 
 
-  Definition weq_inverse_list (w : A → A) (we : isweq w) (l : swap_list) :
+  Definition weq_inverse_list (l : swap_list) :
     ∑ s : swap_list, invweq (swap_list_to_weq l) = swap_list_to_weq s.
   Proof.
     use tpair.
@@ -342,7 +342,7 @@ Section FinitePermutations.
       induction l as [l p].
       rewrite p. clear p.
       apply total2tohexists ; cbn.
-      now apply weq_inverse_list with (w := w).
+      now apply weq_inverse_list.
   Defined.
 
 End FinitePermutations.
