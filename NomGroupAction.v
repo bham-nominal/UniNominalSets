@@ -243,10 +243,8 @@ Section Perm.
             apply funextfun. intro l.
             (* unfold carrier, swap_list, swap in x. *)
             simpl in x.
-            pose (concatenate_nil_runit swap x).
-            assert (x @ nil = x).
-            { exact p. }
-            rewrite X. apply idpath.
+            pose (p := concatenate_nil_runit swap x).
+            simpl in p. rewrite p. apply idpath.
           - apply isapropiseqclass.
         }
         apply X.
@@ -264,11 +262,8 @@ Section Perm.
       intros x y z. unfold goal. simpl.
       apply subtypeEquality'.
       - simpl.
-        pose (concatenate_assoc x y z).
-        simpl in x, y, z.
-        assert ((x @ y) @ z = x @ y @ z).
-        { exact p. }
-        rewrite X. apply idpath.
+        pose (p := concatenate_assoc x y z).
+        simpl in p. rewrite p. apply idpath.
       - apply isapropiseqclass.
     }
     apply cut.
