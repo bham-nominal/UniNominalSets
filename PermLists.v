@@ -2,11 +2,14 @@ Require Import UniMath.Foundations.PartA.
 Require Import UniMath.Algebra.Monoids_and_Groups.
 Require Import UniMath.Combinatorics.Lists.
 
+Require Import MoreLists.
+
 Section PermLists.
 Variable (A : hSet).
 Variable (dec_A : isdeceq A).
 
-Definition swap := A × A.
+Definition swap := setdirprod A A.
+Definition swap_list := setlist swap.
 
 Definition swap_map : swap -> A -> A.
 Proof.
@@ -102,7 +105,6 @@ Proof.
               ** reflexivity.
 Defined.
 
-Definition swap_list := list swap.
 
 Definition swap_list_to_weq : swap_list -> weq A A.
 Proof.
