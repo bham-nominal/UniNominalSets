@@ -8,6 +8,8 @@ Require Import PermLists.
 
 Section Perm.
 
+  Local Open Scope lists_scope.
+
   Context {A : hSet}.
   Context (dec_A : isdeceq A).
 
@@ -89,9 +91,6 @@ Section Perm.
         rewrite X in X0. exact X0.
   Defined.
 
-  Local Notation "l₁ @ l₂" := (concatenate l₁ l₂).
-  Local Notation "x :: xs" := (cons x xs).
-
   Fact act_cons_swap : forall x xs, actA_f (x :: xs) = swap_map dec_A x ∘ actA_f xs.
   Proof.
     intros.
@@ -114,7 +113,7 @@ Section Perm.
     - intros.
       rewrite concatenateStep.
       idtac.
-      pose (act_cons_swap x (xs @ l2)).
+      pose (act_cons_swap x (xs ++ l2)).
       rewrite X in p.
       rewrite funcomp_assoc in p.
       rewrite <- (act_cons_swap x xs) in p.
