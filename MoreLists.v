@@ -126,3 +126,4 @@ Section ListFacts.
 End ListFacts.
 
 Arguments reverse {_} _.
+Arguments concatenate_assoc {_} _ _ _.

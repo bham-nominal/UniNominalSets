@@ -211,8 +211,6 @@ Section Perm.
     - apply isapropiseqclass.
   Defined.
 
-  (* Definition assoc : isassoc mult := concatenate_assoc (setdirprod A A). *)
-
   Definition unital : isunital mult.
     use isunitalpair.
     - exact unit.
@@ -249,12 +247,33 @@ Section Perm.
         apply X.
   Defined.
 
+  Definition assoc : isassoc mult.
+    unfold isassoc.
+    assert (prop : forall x y z, isaprop (mult (mult x y) z = mult x (mult y z))).
+    { intros x y z. apply (setproperty carrier_q). }
+    pose (goal :=
+      fun x y z => ((mult (mult x y) z = mult x (mult y z)),, prop x y z)
+    ).
+    assert (cut : forall x y z, pr1 (goal x y z)).
+    { simple refine (setquotuniv3prop _ goal _).
+      intros x y z. unfold goal. simpl.
+      apply subtypeEquality'.
+      - simpl.
+        pose (concatenate_assoc x y z).
+        simpl in x, y, z.
+        assert ((x @ y) @ z = x @ y @ z).
+        { exact p. }
+        rewrite X. apply idpath.
+      - apply isapropiseqclass.
+    }
+    apply cut.
+  Defined.
+
   Definition monoidop : ismonoidop mult.
-  apply mk_ismonoidop.
-  (* - exact assoc. *)
-  (* - exact unital. *)
-  (* Defined. *)
-  Admitted.
+    apply mk_ismonoidop.
+    - exact assoc.
+    - exact unital.
+  Defined.
 
   Definition invstruct : invstruct mult monoidop.
   use mk_invstruct.
