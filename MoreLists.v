@@ -67,7 +67,17 @@ Section ListFacts.
 
   Definition concatenate_assoc (l1 l2 l3 : list A) :
     concatenate (concatenate l1 l2) l3 = concatenate l1 (concatenate l2 l3).
-  Admitted.
+  Proof.
+    revert l1.
+    use list_ind.
+    - simpl.
+      rewrite !concatenate_nil_lunit.
+      reflexivity.
+    - simpl ; intros x xs IH.
+      rewrite !concatenateStep.
+      rewrite IH.
+      reflexivity.
+  Defined.
 
 
   Definition reverse {X : UU} : list X -> list X.
