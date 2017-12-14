@@ -170,8 +170,13 @@ Section Perm.
         rewrite <- h. exact h'.
   Defined.
 
-  (* Lemma act_rev : forall l, actA_f (rev _ l) = invmap (actA_f l). *)
-  (* Problem: actA_f isn't an equialence for Coq *)
+  Lemma act_rev : forall l, actA_f (reverse l) = invmap (actA l).
+  Proof.
+    intro l.
+    pose (isasetweqtoset A A (setproperty A)).
+    unfold invmap.
+    (* So what? *)
+  Admitted.
 
   Fact compat_inv : iscomprelfun equiv_gr inv_q.
   Proof.
@@ -181,11 +186,16 @@ Section Perm.
       pose @funextfun. unfold funextfunStatement in f.
       apply f. intro l.
       apply subtypeEquality'.
-      + simpl. admit.
+      + simpl. rewrite 2 act_rev.
+        assert (h : actA l1 = actA l2).
+        { apply subtypeEquality'.
+          - simpl. assumption.
+          - apply isapropisweq.
+        }
+        rewrite h. apply idpath.
       + apply isapropisaprop.
     - apply isapropiseqclass.
-  (* Defined. *)
-  Admitted.
+  Defined.
 
   (* Definition assoc : isassoc mult := concatenate_assoc (setdirprod A A). *)
 
