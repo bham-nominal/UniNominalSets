@@ -36,7 +36,6 @@ Section Perm.
 
   Definition actA : carrier -> A ≃ A.
     intros l.
-    SearchAbout (_ -> _ ≃ _).
     use weqgradth.
     - exact (actA_f l).
     - exact (actA_f (rev l)).
