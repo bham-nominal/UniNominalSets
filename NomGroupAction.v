@@ -69,9 +69,6 @@ Section Perm.
       rewrite swap_auto_inv. exact h.
   Defined.
 
-  (* Coming soon in MoreLists *)
-  Axiom reverse_involution : forall (l : carrier), l = reverse (reverse l).
-
   Definition actA : carrier -> A ≃ A.
     intros l.
     use weqgradth.
@@ -79,7 +76,7 @@ Section Perm.
     - exact (actA_f (reverse l)).
     - apply act_reverse_inverse.
     - pose (act_reverse_inverse (reverse l)).
-      rewrite <- reverse_involution in p. apply p.
+      rewrite reverse_involutive in p. apply p.
   Defined.
 
   Definition hrel_gr : hrel carrier.
