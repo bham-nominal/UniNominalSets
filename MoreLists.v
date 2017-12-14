@@ -6,7 +6,7 @@ Require Import UniMath.Algebra.Monoids_and_Groups.
 Section ListFacts.
   Context (A : hSet).
 
-  Fact list_preserve_hset : isofhlevel 2 (list A).
+  Fact list_preserve_hset : isaset (list A).
   Proof.
     unfold list.
     eapply (@isofhleveltotal2 2).
@@ -26,10 +26,22 @@ Section ListFacts.
     - apply list_preserve_hset.
   Defined.
 
-  Definition rev l :=
-    foldr (fun x acc => @cons A x acc) nil l.
 
-  Definition concatenate_nil_lunit (l : list A) : concatenate l nil = l.
+  Definition reverse {X : UU} : list X -> list X.
+  Proof.
+    use list_ind.
+    - apply nil.
+    - intros x ? rev.
+      exact (concatenate rev (cons x nil)).
+  Defined.
+
+  Definition reverse_cons {X : UU} (x : X) (l : list X)
+    : reverse (cons x l) = concatenate (reverse l) (cons x nil).
+  Proof.
+    reflexivity.
+  Defined.
+
+  Definition concatenate_nil_runit (l : list A) : concatenate l nil = l.
     use (list_ind (λ l, concatenate l nil = l)).
     - reflexivity.
     - intros.
@@ -40,10 +52,17 @@ Section ListFacts.
       reflexivity.
   Defined.
 
+
+  Definition concatenate_nil_lunit {X : UU} : forall (l : list X), concatenate nil l = l.
+  Proof.
+    reflexivity.
+  Defined.
+
+
   Definition concatenate_assoc (l1 l2 l3 : list A) :
     concatenate (concatenate l1 l2) l3 = concatenate l1 (concatenate l2 l3).
   Admitted.
 
 End ListFacts.
 
-Arguments rev {_} _.
+Arguments reverse {_} _.
