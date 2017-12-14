@@ -341,19 +341,15 @@ Section Perm.
     - exact invstruct.
   Defined.
 
-
   Definition Perm : gr.
     use grconstr.
     - use setwithbinoppair.
-      + exact carrier.
-      (* + exact mult. *)
-    (* - simpl. exact grop. *)
-  (* Defined. *)
-  Admitted.
+      + exact carrier_q.
+      + exact mult.
+    - simpl. exact grop.
+  Defined.
 
 End Perm.
-
-
 
 Section Nom.
   Context (AtomSet : hSet).
