@@ -216,17 +216,38 @@ Section Perm.
   Definition unital : isunital mult.
     use isunitalpair.
     - exact unit.
-    - split.
-      + unfold islunit.
-        (* reflexivity. *)
-        intros g.
-        admit.
+    - use isunitpair.
+      + assert (h : forall l, isaprop (mult unit l = l)).
+        { intro l'. apply (setproperty carrier_q). }
+        pose (goal := fun l => ((mult unit l = l),, h l)).
+        assert (forall l, pr1 (goal l)).
+        { use setquotunivprop.
+          intro x. cbn.
+          apply subtypeEquality'.
+          - cbn. apply idpath.
+          - apply isapropiseqclass.
+        }
+        unfold islunit. apply X.
       + unfold isrunit.
-        intros.
-        (* apply concatenate_nil_lunit. *)
-        admit.
-  (* Defined. *)
-  Admitted.
+        assert (h : forall l, isaprop (mult l unit = l)).
+        { intro l'. apply (setproperty carrier_q). }
+        pose (goal := fun l => ((mult l unit = l),, h l)).
+        assert (forall l, pr1 (goal l)).
+        { use setquotunivprop.
+          intro x. cbn.
+          apply subtypeEquality'.
+          - unfold concatenate_q. cbn.
+            apply funextfun. intro l.
+            (* unfold carrier, swap_list, swap in x. *)
+            simpl in x.
+            pose (concatenate_nil_runit swap x).
+            assert (x @ nil = x).
+            { exact p. }
+            rewrite X. apply idpath.
+          - apply isapropiseqclass.
+        }
+        apply X.
+  Defined.
 
   Definition monoidop : ismonoidop mult.
   apply mk_ismonoidop.
