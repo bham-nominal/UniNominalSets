@@ -268,6 +268,45 @@ Section FinitePermutations.
       exact (w = swap_list_to_weq s).
   Defined.
 
+
+  Definition weq_inverse_list (l : swap_list) :
+    ∑ s : swap_list, invweq (swap_list_to_weq l) = swap_list_to_weq s.
+  Proof.
+    use tpair.
+    + apply (reverse l).
+    + simpl.
+      revert l.
+      use list_ind.
+      -- cbn.
+         symmetry.
+         exact inv_idweq_is_idweq.
+      -- simpl ; intros x xs IH.
+         rewrite swap_list_to_weq_cons.
+         rewrite invweqcomp.
+         rewrite reverse_cons.
+         rewrite IH.
+         rewrite <- swap_list_to_weq_concat.
+         use total2_paths2_f.
+         ++ use funextfun.
+            intros z.
+            cbn.
+            assert (swap_map x = swap_map_inv x) as X.
+            {
+              use funextfun.
+              induction x as [xf xt].
+              intros a.
+              unfold swap_map, swap_map_inv.
+              induction (dec_A a xt) as [p1 | n1]
+              ; induction (dec_A a xf) as [p2 | n2] ; try reflexivity.
+              cbn.
+              rewrite <- p1, <- p2.
+              reflexivity.
+            }
+            rewrite X.
+            reflexivity.
+         ++ apply isapropisweq.
+  Defined.
+
   Definition is_sub_gr_finite_perms : issubgr finite_perms.
   Proof.
     use tpair.
@@ -303,38 +342,7 @@ Section FinitePermutations.
       induction l as [l p].
       rewrite p. clear p.
       apply total2tohexists ; cbn.
-      use tpair.
-      + apply (reverse l).
-      + simpl.
-        revert l.
-        use list_ind.
-        -- cbn.
-           symmetry.
-           exact inv_idweq_is_idweq.
-        -- simpl ; intros x xs IH.
-           rewrite swap_list_to_weq_cons.
-           rewrite invweqcomp.
-           rewrite reverse_cons.
-           rewrite IH.
-           rewrite <- swap_list_to_weq_concat.
-           use total2_paths2_f.
-           ++ use funextfun.
-              intros z.
-              cbn.
-              assert (swap_map x = swap_map_inv x) as X.
-              {
-                use funextfun.
-                induction x as [xf xt].
-                intros a.
-                unfold swap_map, swap_map_inv.
-                induction (dec_A a xt) as [p1 | n1]
-                ; induction (dec_A a xf) as [p2 | n2] ; try reflexivity.
-                cbn.
-                rewrite <- p1, <- p2.
-                reflexivity.
-              }
-              rewrite X.
-              reflexivity.
-           ++ apply isapropisweq.
+      now apply weq_inverse_list.
   Defined.
+
 End FinitePermutations.
