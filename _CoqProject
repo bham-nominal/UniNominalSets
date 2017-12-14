@@ -2,6 +2,9 @@
 
 -arg "-type-in-type"
 
+MoreLists.v
+PermLists.v
+
 NomGroupAction.v
 PresheafDefinition.v
-MoreLists.v
+ImageDefinition.v

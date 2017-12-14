@@ -1,4 +1,3 @@
-Add LoadPath "~/Documents/UniMath".
 Require Import UniMath.Foundations.PartA.
 Require Import UniMath.Algebra.Monoids_and_Groups.
 Require Import UniMath.Combinatorics.Lists.
@@ -46,7 +45,7 @@ Defined.
 Section PermutationGroup.
   Variable (A : UU)
            (isasetA : isaset A).
-    
+
   Definition perm_op : setwithbinop.
   Proof.
     unfold setwithbinop.
