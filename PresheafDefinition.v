@@ -64,3 +64,5 @@ Definition nominal_set_cat := [ names_cat, hset_category].
 
 Section nameabstraction.
   Variable (X : nominal_set_cat).
+
+End nameabstraction.

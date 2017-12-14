@@ -36,8 +36,11 @@ Section Perm.
 
   Definition actA : carrier -> A ≃ A.
     intros l.
-    use weqpair.
+    SearchAbout (_ -> _ ≃ _).
+    use weqgradth.
     - exact (actA_f l).
+    - exact (actA_f (rev l)).
+    - intro a. admit.
     - intro a.
   Abort.
 
@@ -151,11 +154,11 @@ Section Perm.
 
   Definition inv_q (l : carrier) : carrier_q.
     use setquotpair.
-    - exact (setquotpr equiv_gr (rev (setdirprod A A) l)).
+    - exact (setquotpr equiv_gr (rev l)).
     - use iseqclassconstr.
       + apply hinhpr.
         use carrierpair.
-        * exact (rev (setdirprod A A) l).
+        * exact (rev l).
         * simpl. apply idpath.
       + intros l1 l2 R_l1_l2 Rl1. simpl in *.
         rewrite Rl1. assumption.
@@ -180,36 +183,40 @@ Section Perm.
   (* Defined. *)
   Admitted.
 
-  Definition assoc : isassoc mult := concatenate_assoc (setdirprod A A).
+  (* Definition assoc : isassoc mult := concatenate_assoc (setdirprod A A). *)
 
   Definition unital : isunital mult.
     use isunitalpair.
     - exact unit.
     - split.
       + unfold islunit.
-        reflexivity.
+        (* reflexivity. *)
+        admit.
       + unfold isrunit.
         intros.
-        apply concatenate_nil_lunit.
-  Defined.
+        (* apply concatenate_nil_lunit. *)
+        admit.
+  (* Defined. *)
+  Admitted.
 
   Definition monoidop : ismonoidop mult.
   apply mk_ismonoidop.
-  - exact assoc.
-  - exact unital.
-  Defined.
+  (* - exact assoc. *)
+  (* - exact unital. *)
+  (* Defined. *)
+  Admitted.
 
   Definition invstruct : invstruct mult monoidop.
   use mk_invstruct.
-  - exact inv.
-  - unfold unel_is. simpl.
-    apply mk_isinv.
-    + unfold islinv.
-      intros.
+  (* - exact inv. *)
+  (* - unfold unel_is. simpl. *)
+  (*   apply mk_isinv. *)
+  (*   + unfold islinv. *)
+  (*     intros. *)
 
-    + unfold isrinv.
-      intros.
-      admit.
+  (*   + unfold isrinv. *)
+  (*     intros. *)
+  (*     admit. *)
   Admitted.
 
   Definition grop : isgrop mult.
@@ -223,10 +230,10 @@ Section Perm.
     use grconstr.
     - use setwithbinoppair.
       + exact carrier.
-      + exact mult.
-    - simpl. exact grop.
-  Defined.
-
+      (* + exact mult. *)
+    (* - simpl. exact grop. *)
+  (* Defined. *)
+  Admitted.
 
 End Perm.
 
@@ -235,9 +242,9 @@ End Perm.
 Section Nom.
   Context (AtomSet : hSet).
   Context (PermASet : UU).
-  Context (finitelySupported : ∀ {X : PermASet}, X -> UU).
+  (* Context (finitelySupported : ∀ {X : PermASet}, X -> UU). *)
 
-  Definition isNominalSet (X : PermASet) :=
-    ∀ x : X, finitelySupported x.
+  (* Definition isNominalSet (X : PermASet) := *)
+  (*   ∀ x : X, finitelySupported x. *)
 
 End Nom.
