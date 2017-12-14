@@ -5,20 +5,6 @@ Require Import UniMath.Combinatorics.Lists.
 Require Import MoreLists.
 Require Import PermLists.
 
-
-Definition weq_compose
-           {A B C : Type}
-           (f : A ≃ B)
-           (g : B ≃ C)
-  : A ≃ C.
-Proof.
-  now apply (weqcomp f).
-  (* induction f as [f wef]. *)
-  (* induction g as [g weg]. *)
-  (* exists (g ∘ f). *)
-  (* apply twooutof3c ; assumption. *)
-Defined.
-
 Section PermutationGroup.
   Variable (A : UU)
            (isasetA : isaset A).
@@ -34,7 +20,7 @@ Section PermutationGroup.
         exact isasetA.
     - simpl.
       intros g f.
-      apply (weq_compose f g).
+      apply (weqcomp f g).
   Defined.
 
   Definition perm_group : gr.
@@ -140,5 +126,99 @@ Section FinitePermutations.
       apply total2tohexists ; cbn.
       now apply weq_inverse_list.
   Defined.
-
 End FinitePermutations.
+
+Section GroupAction.
+  Definition action (A : UU) (G : gr) : UU.
+  Proof.
+    use (∑ (f : G -> A -> A), _ × _).
+    - exact (forall (a : A), f (unel G) a = a).
+    - exact (forall (g1 g2 : G) (a : A), f (op g1 g2) a = f g1 (f g2 a)).
+  Defined.
+
+  Definition mult_action (G : gr) : action G G.
+  Proof.
+    exists op.
+    split ; [ apply lunax | apply assocax ].
+  Defined.
+End GroupAction.
+
+Definition finite_perm_gr : gr.
+Proof.
+  use carrierofasubgr.
+  apply (perm_group nat isasetnat).
+  unfold subgr.
+  exists (@finite_perms natset isdeceqnat).
+  exact (@is_sub_gr_finite_perms natset isdeceqnat).
+Defined.
+
+Definition app_action : action natset finite_perm_gr.
+Proof.
+  unfold action.
+  use tpair.
+  - intros f n.
+    apply (pr1 (pr1 f) n).
+  - use tpair.
+    + simpl.
+      reflexivity.
+    + intros f1 f2 n.
+      induction f1 as [f1 p1].
+      induction f2 as [f2 p2].
+      simpl.
+      reflexivity.
+Defined.
+
+Definition member {A : UU} (deceqA : isdeceq A) : A -> list A -> bool.
+Proof.
+  intros a.
+  use list_ind.
+  - apply false.
+  - simpl ; intros x xs IH.
+    induction (deceqA a x).
+    + apply true.
+    + apply IH.
+Defined.
+
+Definition nominal_set : UU.
+Proof.
+  use (∑ (X : hSet) (f : action X finite_perm_gr), _).
+  use (∀ (x : X), hexists _).
+  - exact (list nat).
+  - intros l.
+    induction f as [f p].
+    use (∀ (π : finite_perm_gr), _).
+    use himpl.
+    + use (∀ (n : nat), _).
+      use himpl.
+      * use eqset.
+        -- exact boolset.
+        -- exact (member isdeceqnat n l).
+        -- exact true.
+      * unfold finite_perm_gr in π.
+        use eqset.
+        -- exact natset.
+        -- exact (pr1 (pr1 π) n).
+        -- exact n.
+    + use eqset ; [ apply X | apply (f π x) | apply x].
+Defined.
+
+Definition nat_nominal_set : nominal_set.
+Proof.
+  unfold nominal_set.
+  exists natset.
+  use tpair.
+  - apply app_action.
+  - simpl.
+    intros n.
+    apply total2tohexists.
+    exists (cons n nil).
+    intros x H.
+    apply (H n).
+    cbn.
+    destruct (isdeceqnat n n).
+    + simpl.
+      reflexivity.
+    + use fromempty.
+      apply n0.
+      apply idpath.
+Defined.
