@@ -25,14 +25,62 @@ Section Perm.
     - exact l.
   Defined.
 
+  Local Notation "l₁ @ l₂" := (concatenate l₁ l₂).
+  Local Notation "x :: xs" := (cons x xs).
+
+  Fact act_cons_swap : forall x xs, actA_f (x :: xs) = swap_map dec_A x ∘ actA_f xs.
+  Proof.
+    intros.
+    unfold actA_f.
+    apply funextfun.
+    intros a.
+    simpl.
+    rewrite list_ind_compute_2.
+    unfold funcomp.
+    reflexivity.
+  Defined.
+
+  Lemma act_concat_comp : forall l1 l2, actA_f (concatenate l1 l2) = (actA_f l1) ∘ (actA_f l2).
+  Proof.
+    intros l1 l2.
+    apply (@list_ind (setdirprod A A)
+                     (λ l1, actA_f (concatenate l1 l2) = actA_f l1 ∘ actA_f l2)).
+    - apply idpath.
+    - intros.
+      rewrite concatenateStep.
+      idtac.
+      pose (act_cons_swap x (xs ++ l2)).
+      rewrite X in p.
+      rewrite funcomp_assoc in p.
+      rewrite <- (act_cons_swap x xs) in p.
+      exact p.
+  Defined.
+
+  Lemma act_reverse_inverse (l : carrier) :
+    ∏ x : A, actA_f (reverse l) (actA_f l x) = x.
+  Proof.
+    intro a.
+    apply (@list_ind (setdirprod A A) (fun l => actA_f (reverse l) (actA_f l a) = a)).
+    - cbn. apply idpath.
+    - intros x xs h.
+      rewrite reverse_cons. rewrite act_concat_comp.
+      rewrite 2 act_cons_swap.
+      unfold funcomp. cbn.
+      rewrite swap_auto_inv. exact h.
+  Defined.
+
+  (* Coming soon in MoreLists *)
+  Axiom reverse_involution : forall (l : carrier), l = reverse (reverse l).
+
   Definition actA : carrier -> A ≃ A.
     intros l.
     use weqgradth.
     - exact (actA_f l).
     - exact (actA_f (reverse l)).
-    - intro a. admit.
-    - intro a.
-  Abort.
+    - apply act_reverse_inverse.
+    - pose (act_reverse_inverse (reverse l)).
+      rewrite <- reverse_involution in p. apply p.
+  Defined.
 
   Definition hrel_gr : hrel carrier.
     unfold hrel.
@@ -91,35 +139,6 @@ Section Perm.
         rewrite X in X0. exact X0.
   Defined.
 
-  Fact act_cons_swap : forall x xs, actA_f (x :: xs) = swap_map dec_A x ∘ actA_f xs.
-  Proof.
-    intros.
-    unfold actA_f.
-    apply funextfun.
-    intros a.
-    simpl.
-    rewrite list_ind_compute_2.
-    unfold funcomp.
-    reflexivity.
-  Defined.
-
-
-  Lemma act_concat_comp : forall l1 l2, actA_f (concatenate l1 l2) = (actA_f l1) ∘ (actA_f l2).
-  Proof.
-    intros l1 l2.
-    apply (@list_ind (setdirprod A A)
-                     (λ l1, actA_f (concatenate l1 l2) = actA_f l1 ∘ actA_f l2)).
-    - apply idpath.
-    - intros.
-      rewrite concatenateStep.
-      idtac.
-      pose (act_cons_swap x (xs ++ l2)).
-      rewrite X in p.
-      rewrite funcomp_assoc in p.
-      rewrite <- (act_cons_swap x xs) in p.
-      exact p.
-  Defined.
-
   Fact compat_concat : iscomprelfun2 equiv_gr concatenate_q.
     intros x ? y y' R_x_x' R_y_y'.
     simpl in R_x_x', R_y_y'.
@@ -153,8 +172,13 @@ Section Perm.
         rewrite <- h. exact h'.
   Defined.
 
-  (* Lemma act_rev : forall l, actA_f (rev _ l) = invmap (actA_f l). *)
-  (* Problem: actA_f isn't an equialence for Coq *)
+  Lemma act_rev : forall l, actA_f (reverse l) = invmap (actA l).
+  Proof.
+    intro l.
+    pose (isasetweqtoset A A (setproperty A)).
+    unfold invmap.
+    (* So what? *)
+  Admitted.
 
   Fact compat_inv : iscomprelfun equiv_gr inv_q.
   Proof.
@@ -164,11 +188,16 @@ Section Perm.
       pose @funextfun. unfold funextfunStatement in f.
       apply f. intro l.
       apply subtypeEquality'.
-      + simpl. admit.
+      + simpl. rewrite 2 act_rev.
+        assert (h : actA l1 = actA l2).
+        { apply subtypeEquality'.
+          - simpl. assumption.
+          - apply isapropisweq.
+        }
+        rewrite h. apply idpath.
       + apply isapropisaprop.
     - apply isapropiseqclass.
-  (* Defined. *)
-  Admitted.
+  Defined.
 
   (* Definition assoc : isassoc mult := concatenate_assoc (setdirprod A A). *)
 
@@ -178,6 +207,7 @@ Section Perm.
     - split.
       + unfold islunit.
         (* reflexivity. *)
+        intros g.
         admit.
       + unfold isrunit.
         intros.
