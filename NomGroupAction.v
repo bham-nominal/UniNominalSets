@@ -25,9 +25,6 @@ Section Perm.
     - exact l.
   Defined.
 
-  Local Notation "l₁ @ l₂" := (concatenate l₁ l₂).
-  Local Notation "x :: xs" := (cons x xs).
-
   Fact act_cons_swap : forall x xs, actA_f (x :: xs) = swap_map dec_A x ∘ actA_f xs.
   Proof.
     intros.
